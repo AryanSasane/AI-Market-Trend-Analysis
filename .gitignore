@@ -1,0 +1,14 @@
+#Caches
+__pycache__/
+apis_data_collection/__pycache__/
+notifications/__pycache__/
+
+#Python Environment
+venv/
+Pipfile
+
+#Environment Variables
+.env
+
+#Any Log Files
+*.log

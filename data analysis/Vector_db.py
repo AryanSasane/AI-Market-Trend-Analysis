@@ -1,0 +1,93 @@
+# 1. Import Heaeder Libraries
+import pandas as pd
+from langchain_community.vectorstores import FAISS
+from langchain_huggingface import HuggingFaceEmbeddings
+
+
+
+# 2. Load Data Files
+reviews_df = pd.read_csv("final data/category_wise_lda_output_with_topic_labels.csv")
+news_df = pd.read_csv("final data/news_data_with_sentiment.csv")
+reddit_df = pd.read_excel("final data/reddit_category_trend_data.xlsx")
+
+def clean_category(cat):
+    if pd.isna(cat):
+        return cat
+    return str(cat).replace("_", " ").strip()
+
+documents = []
+metadatas = []
+
+
+
+# 3. Reviews
+for _, row in reviews_df.iterrows():
+    text = f"""
+    Product: {row["product"]}
+    Review: {row["review_text"]}
+    Sentiment: {row["sentiment_label"]}
+    Category: {row["category"]}
+    Topic: {row["topic_label"]}
+    """
+
+    documents.append(text)
+
+    metadatas.append({
+        "source":row["source"],
+        "product":row["product"],
+        "category":row["category"],
+        "sentiment":row["sentiment_label"]
+    })
+
+
+
+# 4. News
+for _, row in news_df.iterrows():
+    text=f"""
+    News Title: {row["title"]}
+    Discription: {row["description"]}
+    Content: {row["content"]}
+    Category: {row["category"]}
+    Sentiment: {row["sentiment_label"]}
+    """
+    
+    documents.append(text)
+    
+    metadatas.append({
+        "source":"news",
+        "category":row["category"],
+        "sentiment": row["sentiment_label"]
+    })
+
+
+
+# 5. Reddit
+for _, row in reddit_df.iterrows():
+    text=f"""
+    Reddit Post: {row["title"]}
+    Discussion: {row["selftext"]}
+    Category: {row["category_label"]}
+    """
+    
+    documents.append(text)
+    
+    metadatas.append({
+        "source":"reddit",
+        "subreddit":row["subreddit"],
+        "category":row["category_label"]
+    })
+
+
+
+#
+embeddings = HuggingFaceEmbeddings(
+    model_name="sentence-transformers/all-MiniLM-L6-v2"   
+)
+
+vector_db = FAISS.from_texts(
+    texts=documents,
+    embedding=embeddings,
+    metadatas = metadatas
+)
+
+vector_db.save_local("consumer_sentiment_faiss")

@@ -1,0 +1,30 @@
+python-dotenv
+pandas
+openpyxl
+transformers
+torch
+huggingface_hub[hf_xet]
+tqdm
+scikit_learn
+streamlit
+sentencepiece
+plotly
+
+#for RAG
+langchain
+langchain-community
+langchain-huggingface
+sentence-transformers
+faiss-cpu
+numpy
+
+#for Chatbot
+openai
+nltk
+google-genai
+groq
+
+#for Notifications
+secure-smtplib
+schedule
+scrape
